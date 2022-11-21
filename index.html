@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Home</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <!--
+      Need a visual blank slate?
+      Remove all code in `styles.css`!
+    -->
+    <link rel="stylesheet" href="styles.css" />
+    <script src="./lib/pdf.js"></script>
+    <script type="module" src="script.js"></script>
+  </head>
+  <body>
+    <input type="file" id="pdf-upload" accept="application/pdf" />
+    <button id="zoom-in">Zoom In</button>
+    <div id="zoom-percent">60</div>
+    <button id="zoom-out">Zoom Out</button>
+    <button id="zoom-reset">Reset Zoom</button>
+    <div id="pages"></div>
+  </body>
+</html>
