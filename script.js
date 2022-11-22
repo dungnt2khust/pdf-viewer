@@ -1,5 +1,6 @@
 pdfjsLib.GlobalWorkerOptions.workerSrc = './lib/pdf.worker.js';
-var url = 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf';
+var url =
+  'https://ik.imagekit.io/xgd8aidjc/TL_h%C6%B0%E1%BB%9Bng_d%E1%BA%ABn_nh%C3%A2n_vi%C3%AAn_m%E1%BB%9Bi.pdf?ik-sdk-version=javascript-1.4.3&updatedAt=1667466441294';
 document.querySelector('#pdf-upload').addEventListener('change', function (e) {
   // document.querySelector('#pages').innerHTML = '';
   zoomReset();
@@ -10,81 +11,41 @@ document.querySelector('#pdf-upload').addEventListener('change', function (e) {
   }
 
   // var fileReader = new FileReader();
-  var loadingTask = pdfjsLib.getDocument(url);
+  pdfjsLib.getDocument(url).promise.then(function (pdf) {
+    console.log('pdf');
+    // you can now use *pdf* here
+    console.log('the pdf has', pdf.numPages, 'page(s).');
+    for (var i = 0; i < pdf.numPages; i++) {
+      (function (pageNum) {
+        pdf.getPage(i + 1).then(function (page) {
+          // you can now use *page* here
+          var viewport = page.getViewport(2.0);
+          var pageNumDiv = document.createElement('div');
+          pageNumDiv.className = 'pageNumber';
+          pageNumDiv.innerHTML = 'Page ' + pageNum;
+          var canvas = document.createElement('canvas');
+          canvas.className = 'page';
+          canvas.title = 'Page ' + pageNum;
+          document.querySelector('#pages').appendChild(pageNumDiv);
+          document.querySelector('#pages').appendChild(canvas);
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
 
-  loadingTask.promise.then(function(pdf) {
-    console.log('PDF loaded');
-    
-    // Fetch the first page
-    var pageNumber = 1;
-    pdf.getPage(pageNumber).then(function(page) {
-      console.log('Page loaded');
-      
-      var scale = 1.5;
-      var viewport = page.getViewport({scale: scale});
-  
-      // Prepare canvas using PDF page dimensions
-      var canvas = document.getElementById('the-canvas');
-      var context = canvas.getContext('2d');
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-  
-      // Render PDF page into canvas context
-      var renderContext = {
-        canvasContext: context,
-        viewport: viewport
-      };
-      var renderTask = page.render(renderContext);
-      renderTask.promise.then(function () {
-        console.log('Page rendered');
-      });
-    });
-  }, function (reason) {
-    // PDF loading error
-    console.error(reason);
+          page
+            .render({
+              canvasContext: canvas.getContext('2d'),
+              viewport: viewport,
+            })
+            .promise.then(function () {
+              console.log('Page rendered');
+            });
+          page.getTextContent().then(function (text) {
+            console.log(text);
+          });
+        });
+      })(i + 1);
+    }
   });
-
-
-  // fileReader.onload = function () {
-  //   var typedarray = new Uint8Array(this.result);
-
-  //   pdfjsLib.getDocument(typedarray).promise.then(function (pdf) {
-  //     // you can now use *pdf* here
-  //     console.log('the pdf has', pdf.numPages, 'page(s).');
-  //     for (var i = 0; i < pdf.numPages; i++) {
-  //       (function (pageNum) {
-  //         pdf.getPage(i + 1).then(function (page) {
-  //           // you can now use *page* here
-  //           var viewport = page.getViewport(2.0);
-  //           var pageNumDiv = document.createElement('div');
-  //           pageNumDiv.className = 'pageNumber';
-  //           pageNumDiv.innerHTML = 'Page ' + pageNum;
-  //           var canvas = document.createElement('canvas');
-  //           canvas.className = 'page';
-  //           canvas.title = 'Page ' + pageNum;
-  //           document.querySelector('#pages').appendChild(pageNumDiv);
-  //           document.querySelector('#pages').appendChild(canvas);
-  //           canvas.height = viewport.height;
-  //           canvas.width = viewport.width;
-
-  //           page
-  //             .render({
-  //               canvasContext: canvas.getContext('2d'),
-  //               viewport: viewport,
-  //             })
-  //             .promise.then(function () {
-  //               console.log('Page rendered');
-  //             });
-  //           page.getTextContent().then(function (text) {
-  //             console.log(text);
-  //           });
-  //         });
-  //       })(i + 1);
-  //     }
-  //   });
-  // };
-
-  // fileReader.readAsArrayBuffer(file);
 });
 
 var curWidth = 60;
